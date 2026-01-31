@@ -2,13 +2,16 @@
 
 public static class StringExtension
 {
-    public static byte[] AsByteArray(this string input)
+    extension(string input)
     {
-        return Encoding.UTF8.GetBytes(input);
-    }
+        public byte[] AsByteArray()
+        {
+            return Encoding.UTF8.GetBytes(input);
+        }
 
-    public static Stream AsStream(this string input)
-    {
-        return new MemoryStream(input.AsByteArray());
+        public Stream AsStream()
+        {
+            return new MemoryStream(input.AsByteArray());
+        }
     }
 }
