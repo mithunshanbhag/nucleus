@@ -1,10 +1,10 @@
 ﻿namespace Nucleus.Misc.Helpers;
 
-public class RetryHelper
+public class NRetryHelper
 {
     private readonly ResiliencePipeline _resiliencePipeline;
 
-    public RetryHelper(int maxRetryAttempts = 3, int delayInMilliSecs = 5,
+    public NRetryHelper(int maxRetryAttempts = 3, int delayInMilliSecs = 5,
         DelayBackoffType delayBackoffType = DelayBackoffType.Constant)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxRetryAttempts);

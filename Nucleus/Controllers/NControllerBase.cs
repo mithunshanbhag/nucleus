@@ -1,12 +1,14 @@
-﻿namespace Nucleus.Controllers;
+﻿using ValidationException = FluentValidation.ValidationException;
 
-public abstract class ControllerBase
+namespace Nucleus.Controllers;
+
+public abstract class NControllerBase
 {
-    protected readonly ILogger<ControllerBase> Logger;
+    protected readonly ILogger<NControllerBase> Logger;
 
     protected readonly IMediator Mediator;
 
-    protected ControllerBase(IMediator mediator, ILogger<ControllerBase> logger)
+    protected NControllerBase(IMediator mediator, ILogger<NControllerBase> logger)
     {
         Mediator = mediator;
         Logger = logger;
@@ -18,7 +20,7 @@ public abstract class ControllerBase
         {
             return await Mediator.Send(request);
         }
-        catch (ExceptionBase cpe)
+        catch (NExceptionBase cpe)
         {
             return cpe.ToActionResult();
         }
@@ -34,7 +36,7 @@ public abstract class ControllerBase
         {
             return await func();
         }
-        catch (ExceptionBase cpe)
+        catch (NExceptionBase cpe)
         {
             return cpe.ToActionResult();
         }
