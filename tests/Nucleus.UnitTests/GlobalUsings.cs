@@ -1,0 +1,9 @@
+﻿global using Azure.Messaging.ServiceBus;
+global using FluentAssertions;
+global using Microsoft.Azure.Cosmos;
+global using Moq;
+global using Nucleus.EventStreams.Implementations;
+global using Nucleus.EventStreams.Interfaces;
+global using Nucleus.Repositories.Implementations;
+global using Nucleus.Repositories.Interfaces;
+global using Xunit;
