@@ -1,0 +1,35 @@
+name: nucleus-deploy-template
+
+on:
+  workflow_call:
+
+env:
+  DOTNET_VERSION_10: "10.0.x"
+
+jobs:
+  build-deploy-nucleus-app:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4.1.1
+      - name: setup dotnet
+        uses: actions/setup-dotnet@v4.0.0
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION_10 }}
+      - name: dotnet restore
+        run: dotnet restore
+        working-directory: ./src/Nucleus.Ui
+      - name: run unit tests
+        run: dotnet test ./tests/Nucleus.Ui.UnitTests/Nucleus.Ui.UnitTests.csproj --logger trx --results-directory ./tests/Nucleus.Ui.UnitTests/TestResults-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: publish unit test results
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: Nucleus.UnitTests
+          path: ./tests/Nucleus.Ui.UnitTests/TestResults-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: build nucleus
+        run: dotnet build ./src/Nucleus/Nucleus.csproj -c Release
+      - name: nuget pack
+        run: dotnet pack ./src/Nucleus/Nucleus.csproj -c Release -o ./Publish/Nucleus
+      - name: publish to nuget
+        run: dotnet nuget push ./Publish/Nucleus/*.nupkg -k ${{ secrets.API_KEY_NUCLEUS }} -s https://api.nuget.org/v3/index.json
