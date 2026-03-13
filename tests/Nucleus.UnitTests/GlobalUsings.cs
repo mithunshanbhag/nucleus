@@ -1,5 +1,4 @@
 ﻿global using Azure.Messaging.ServiceBus;
-global using FluentAssertions;
 global using Microsoft.Azure.Cosmos;
 global using Moq;
 global using Nucleus.EventStreams.Implementations;

@@ -102,7 +102,7 @@ public class CosmosGenericRepositoryTests
         var act = () => _sut.AddAsync(PartitionKeyValue, entity, cancellationToken);
 
         // Assert
-        await act.Should().ThrowAsync<OperationCanceledException>();
+        await Assert.ThrowsAsync<OperationCanceledException>(act);
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public class CosmosGenericRepositoryTests
         var act = () => _sut.UpsertAsync(PartitionKeyValue, entity, cancellationToken);
 
         // Assert
-        await act.Should().ThrowAsync<OperationCanceledException>();
+        await Assert.ThrowsAsync<OperationCanceledException>(act);
     }
 
     [Fact]
@@ -130,7 +130,7 @@ public class CosmosGenericRepositoryTests
         var act = () => _sut.DeleteAsync(PartitionKeyValue, entity.Id!, cancellationToken);
 
         // Assert
-        await act.Should().ThrowAsync<OperationCanceledException>();
+        await Assert.ThrowsAsync<OperationCanceledException>(act);
     }
 
     [Fact]
@@ -144,7 +144,7 @@ public class CosmosGenericRepositoryTests
         var act = () => _sut.GetAsync(PartitionKeyValue, entity.Id!, cancellationToken);
 
         // Assert
-        await act.Should().ThrowAsync<OperationCanceledException>();
+        await Assert.ThrowsAsync<OperationCanceledException>(act);
     }
 
     #endregion

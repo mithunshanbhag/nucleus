@@ -19,7 +19,7 @@ public class StringExtensionTests
         var actual = Input.AsByteArray();
 
         // Assert
-        actual.Should().Equal(expected);
+        Assert.Equal(expected, actual);
     }
 
     [Fact]
@@ -32,9 +32,8 @@ public class StringExtensionTests
         var actual = Input.AsStream();
 
         // Assert
-        actual.Should().BeOfType<MemoryStream>()
-            .Which.ToArray()
-            .Should().Equal(expected.ToArray());
+        var memoryStream = Assert.IsType<MemoryStream>(actual);
+        Assert.Equal(expected.ToArray(), memoryStream.ToArray());
     }
 
     [Fact]
@@ -47,7 +46,7 @@ public class StringExtensionTests
         var actual = Input.AsStream();
 
         // Assert
-        actual.AsByteArray().Should().Equal(expected.ToArray());
+        Assert.Equal(expected.ToArray(), actual.AsByteArray());
     }
 
     #endregion
@@ -61,7 +60,7 @@ public class StringExtensionTests
         var actual = string.Empty.AsByteArray();
 
         // Assert
-        actual.Should().BeEmpty();
+        Assert.Empty(actual);
     }
 
     [Fact]
@@ -71,9 +70,8 @@ public class StringExtensionTests
         var actual = string.Empty.AsStream();
 
         // Assert
-        actual.Should().BeOfType<MemoryStream>()
-            .Which.ToArray()
-            .Should().BeEmpty();
+        var memoryStream = Assert.IsType<MemoryStream>(actual);
+        Assert.Empty(memoryStream.ToArray());
     }
 
     #endregion
