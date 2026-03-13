@@ -85,6 +85,7 @@ Nucleus is a library repository, and the root-level [`run-local.ps1`](run-local.
 .\run-local.ps1            # runs all test projects (default target: tests)
 .\run-local.ps1 unit-tests # runs the unit test project
 .\run-local.ps1 app        # builds the package project in Release
+.\run-local.ps1 package-size # compares Debug vs Release .nupkg and DLL sizes
 ```
 
 If you need the underlying `dotnet` commands directly, use:
@@ -95,6 +96,21 @@ dotnet build .\Nucleus.slnx
 dotnet test .\Nucleus.slnx
 dotnet pack .\src\Nucleus\Nucleus.csproj -c Release
 ```
+
+### Debug vs Release package sizing
+
+If you want to confirm the impact before publishing, run:
+
+```powershell
+.\run-local.ps1 package-size
+```
+
+On the current preview package, local comparisons show that Release is consistently smaller than Debug:
+
+- `.nupkg`: roughly `1.4 KB` smaller, or about `6%`
+- `Nucleus.dll`: roughly `3.5 KB` smaller, or about `7.5%`
+
+Use the script output as the source of truth for the exact current numbers before publishing.
 
 ## 🧪 Running the tests
 
