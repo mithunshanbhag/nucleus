@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('app', 'tests', 'unit-tests', 'e2e-tests')]
+    [ValidateSet('app', 'tests', 'unit-tests', 'e2e-tests', 'package-size')]
     [string]$Target = 'tests'
 )
 
@@ -94,6 +94,71 @@ function Invoke-TestProjects {
     }
 }
 
+function Get-LatestPackageFile {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Configuration
+    )
+
+    $packageDirectory = Join-Path -Path $repoRoot -ChildPath ("src\Nucleus\bin\{0}" -f $Configuration)
+
+    $packageFile = Get-ChildItem -Path $packageDirectory -Filter '*.nupkg' -File |
+        Sort-Object -Property LastWriteTimeUtc -Descending |
+        Select-Object -First 1
+
+    if ($null -eq $packageFile) {
+        throw "No package file was found under $packageDirectory."
+    }
+
+    return $packageFile
+}
+
+function Get-SizeReductionPercent {
+    param(
+        [Parameter(Mandatory)]
+        [long]$DebugSize,
+
+        [Parameter(Mandatory)]
+        [long]$ReleaseSize
+    )
+
+    if ($DebugSize -le 0) {
+        return 0d
+    }
+
+    return (($DebugSize - $ReleaseSize) / $DebugSize) * 100
+}
+
+function Write-PackageSizeComparison {
+    Assert-PathExists -Path $packageProjectPath -Description 'Package project'
+
+    Restore-Target -Path $packageProjectPath
+    Invoke-DotNet -Arguments @('build', $packageProjectPath, '--configuration', 'Debug', '--nologo', '--no-restore')
+    Invoke-DotNet -Arguments @('build', $packageProjectPath, '--configuration', 'Release', '--nologo', '--no-restore')
+
+    $debugPackage = Get-LatestPackageFile -Configuration 'Debug'
+    $releasePackage = Get-LatestPackageFile -Configuration 'Release'
+    $debugDllPath = Join-Path -Path $repoRoot -ChildPath 'src\Nucleus\bin\Debug\net10.0\Nucleus.dll'
+    $releaseDllPath = Join-Path -Path $repoRoot -ChildPath 'src\Nucleus\bin\Release\net10.0\Nucleus.dll'
+
+    Assert-PathExists -Path $debugPackage.FullName -Description 'Debug package'
+    Assert-PathExists -Path $releasePackage.FullName -Description 'Release package'
+    Assert-PathExists -Path $debugDllPath -Description 'Debug assembly'
+    Assert-PathExists -Path $releaseDllPath -Description 'Release assembly'
+
+    $debugPackageSize = (Get-Item -LiteralPath $debugPackage.FullName).Length
+    $releasePackageSize = (Get-Item -LiteralPath $releasePackage.FullName).Length
+    $debugDllSize = (Get-Item -LiteralPath $debugDllPath).Length
+    $releaseDllSize = (Get-Item -LiteralPath $releaseDllPath).Length
+
+    $packageReductionPercent = Get-SizeReductionPercent -DebugSize $debugPackageSize -ReleaseSize $releasePackageSize
+    $dllReductionPercent = Get-SizeReductionPercent -DebugSize $debugDllSize -ReleaseSize $releaseDllSize
+
+    Write-Host 'Debug vs Release package size comparison:' -ForegroundColor Yellow
+    Write-Host ("  Package (.nupkg): Debug = {0} bytes, Release = {1} bytes, Reduction = {2} bytes ({3:N2}%)" -f $debugPackageSize, $releasePackageSize, ($debugPackageSize - $releasePackageSize), $packageReductionPercent)
+    Write-Host ("  Assembly (.dll):  Debug = {0} bytes, Release = {1} bytes, Reduction = {2} bytes ({3:N2}%)" -f $debugDllSize, $releaseDllSize, ($debugDllSize - $releaseDllSize), $dllReductionPercent)
+}
+
 Push-Location -LiteralPath $repoRoot
 
 try {
@@ -124,6 +189,10 @@ try {
             }
 
             Invoke-TestProjects -ProjectPaths $e2eProjects -Label 'E2E'
+        }
+
+        'package-size' {
+            Write-PackageSizeComparison
         }
     }
 
