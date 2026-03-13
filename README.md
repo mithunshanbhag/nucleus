@@ -105,12 +105,12 @@ If you want to confirm the impact before publishing, run:
 .\run-local.ps1 package-size
 ```
 
-On the current `1.0.0-alpha.7` package, a local comparison shows:
+On the current preview package, local comparisons show that Release is consistently smaller than Debug:
 
-- `.nupkg`: `23310` bytes in Debug vs `21886` bytes in Release (`1424` bytes smaller, about `6.11%`)
-- `Nucleus.dll`: `47616` bytes in Debug vs `44032` bytes in Release (`3584` bytes smaller, about `7.53%`)
+- `.nupkg`: roughly `1.4 KB` smaller, or about `6%`
+- `Nucleus.dll`: roughly `3.5 KB` smaller, or about `7.5%`
 
-That makes Release the better publishing choice even for the current preview package.
+Use the script output as the source of truth for the exact current numbers before publishing.
 
 ## 🧪 Running the tests
 

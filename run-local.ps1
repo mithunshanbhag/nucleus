@@ -123,7 +123,7 @@ function Get-SizeReductionPercent {
     )
 
     if ($DebugSize -le 0) {
-        return 0d
+        return 0.0
     }
 
     return (($DebugSize - $ReleaseSize) / $DebugSize) * 100
