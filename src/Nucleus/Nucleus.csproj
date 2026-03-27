@@ -7,7 +7,7 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Nucleus</Title>
 		<Authors>Mithun Shanbhag</Authors>
-		<Version>1.0.0-alpha.9</Version>
+		<Version>1.0.0-alpha.10</Version>
 		<PackageId>MithunShanbhag.Nucleus</PackageId>
 	</PropertyGroup>
 
@@ -21,16 +21,8 @@
 		<PackageReference Include="Microsoft.AspNetCore.Components" Version="10.0.5" />
 		<PackageReference Include="Microsoft.Azure.Cosmos" Version="3.57.1" />
 		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.OpenApi" Version="1.6.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.5" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.5">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.4.0" />
 		<PackageReference Include="Microsoft.Extensions.Resilience" Version="10.4.0" />
 		<PackageReference Include="Spectre.Console" Version="0.54.0" />
-		<PackageReference Include="System.CommandLine" Version="2.0.5" />
-		<PackageReference Include="System.Linq.Async" Version="7.0.0" />
 	</ItemGroup>
 
 </Project>
