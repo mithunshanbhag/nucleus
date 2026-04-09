@@ -1,5 +1,15 @@
 ﻿namespace Nucleus.Repositories.Implementations;
 
+/// <remarks>
+///     Typical usage involves the caller instantiating a Cosmos SDK client as follows:
+///     <code>
+/// var dbConnectionString = builderContext.Configuration[ConfigKeys.CosmosDbConnectionString];
+/// var dbName = builderContext.Configuration[ConfigKeys.MetricsCosmosDbName];
+/// var serializerOptions = new CosmosSerializationOptions { PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase };
+/// var cosmosClientOptions = new CosmosClientOptions { SerializerOptions = serializerOptions };
+/// services.AddSingleton(_ => new CosmosClient(dbConnectionString, cosmosClientOptions).GetDatabase(dbName));
+/// </code>
+/// </remarks>
 public abstract class CosmosGenericRepositoryBase<TEntity> : ICosmosGenericRepository<TEntity> where TEntity : class
 {
     protected readonly string ContainerName;
