@@ -74,6 +74,22 @@ public class CosmosGenericRepositoryTests
     }
 
     [Fact]
+    public async Task DeleteIfExistsAsync_ExistingItem_ReturnsTrue()
+    {
+        // Arrange
+        var entity = CreateEntity();
+        var cancellationToken = CancellationToken.None;
+
+        // Act
+        var result = await _sut.DeleteIfExistsAsync(PartitionKeyValue, entity.Id!, cancellationToken);
+
+        // Assert
+        Assert.True(result);
+        _containerMock.Verify(
+            c => c.DeleteItemAsync<TestDao>(entity.Id, new PartitionKey(PartitionKeyValue), null, cancellationToken), Times.Once);
+    }
+
+    [Fact]
     public async Task GetAsync_ValidRequest_Returns()
     {
         // Arrange
@@ -149,6 +165,43 @@ public class CosmosGenericRepositoryTests
     }
 
     [Fact]
+    public async Task GetScalarValuesByPartitionAsync_ValidRequest_UsesPartitionScopedQuery()
+    {
+        // Arrange
+        var cancellationToken = CancellationToken.None;
+        var expectedValue = 42L;
+        var iteratorMock = CreateFeedIterator<long>([expectedValue], cancellationToken);
+        var queryDefinition = new QueryDefinition("select value count(1) from c where c.type = @type")
+            .WithParameter("@type", PartitionKeyValue);
+
+        _containerMock
+            .Setup(c => c.GetItemQueryIterator<long>(
+                queryDefinition,
+                null,
+                It.Is<QueryRequestOptions>(options =>
+                    options != null &&
+                    options.PartitionKey.HasValue &&
+                    options.PartitionKey.Value.Equals(new PartitionKey(PartitionKeyValue)))))
+            .Returns(iteratorMock.Object);
+
+        // Act
+        var result = await _sut.GetScalarValuesByPartitionAsync<long>(PartitionKeyValue, queryDefinition, cancellationToken);
+
+        // Assert
+        Assert.Single(result);
+        Assert.Equal(expectedValue, result.Single());
+        _containerMock.Verify(
+            c => c.GetItemQueryIterator<long>(
+                queryDefinition,
+                null,
+                It.Is<QueryRequestOptions>(options =>
+                    options != null &&
+                    options.PartitionKey.HasValue &&
+                    options.PartitionKey.Value.Equals(new PartitionKey(PartitionKeyValue)))),
+            Times.Once);
+    }
+
+    [Fact]
     public async Task GetValuesByPartitionAsync_ValidRequest_UsesPartitionScopedQuery()
     {
         // Arrange
@@ -182,6 +235,67 @@ public class CosmosGenericRepositoryTests
                     options != null &&
                     options.PartitionKey.HasValue &&
                     options.PartitionKey.Value.Equals(new PartitionKey(PartitionKeyValue)))),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task ExistsByPartitionAsync_MatchingRecords_ReturnsTrue()
+    {
+        // Arrange
+        var cancellationToken = CancellationToken.None;
+        var iteratorMock = CreateFeedIterator<long>([1L], cancellationToken);
+
+        _containerMock
+            .Setup(c => c.GetItemQueryIterator<long>(
+                It.Is<QueryDefinition>(q => q.QueryText == "select value count(1) from c where c.id = 'abc'"),
+                null,
+                It.Is<QueryRequestOptions>(options =>
+                    options != null &&
+                    options.PartitionKey.HasValue &&
+                    options.PartitionKey.Value.Equals(new PartitionKey(PartitionKeyValue)))))
+            .Returns(iteratorMock.Object);
+
+        // Act
+        var result = await _sut.ExistsByPartitionAsync(PartitionKeyValue, "c.id = 'abc'", cancellationToken);
+
+        // Assert
+        Assert.True(result);
+        _containerMock.Verify(
+            c => c.GetItemQueryIterator<long>(
+                It.Is<QueryDefinition>(q => q.QueryText == "select value count(1) from c where c.id = 'abc'"),
+                null,
+                It.Is<QueryRequestOptions>(options =>
+                    options != null &&
+                    options.PartitionKey.HasValue &&
+                    options.PartitionKey.Value.Equals(new PartitionKey(PartitionKeyValue)))),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task CountAcrossPartitionsAsync_ValidRequest_ReturnsCount()
+    {
+        // Arrange
+        const long expectedCount = 3;
+        var cancellationToken = CancellationToken.None;
+        var iteratorMock = CreateFeedIterator<long>([expectedCount], cancellationToken);
+
+        _containerMock
+            .Setup(c => c.GetItemQueryIterator<long>(
+                It.Is<QueryDefinition>(q => q.QueryText == "select value count(1) from c where c.id = 'abc'"),
+                null,
+                null))
+            .Returns(iteratorMock.Object);
+
+        // Act
+        var result = await _sut.CountAcrossPartitionsAsync("c.id = 'abc'", cancellationToken);
+
+        // Assert
+        Assert.Equal(expectedCount, result);
+        _containerMock.Verify(
+            c => c.GetItemQueryIterator<long>(
+                It.Is<QueryDefinition>(q => q.QueryText == "select value count(1) from c where c.id = 'abc'"),
+                null,
+                null),
             Times.Once);
     }
 
@@ -328,6 +442,20 @@ public class CosmosGenericRepositoryTests
     }
 
     [Fact]
+    public async Task DeleteIfExistsAsync_CancellationRequest_ThrowsException()
+    {
+        // Arrange
+        var entity = CreateEntity();
+        var cancellationToken = new CancellationToken(true);
+
+        // Act
+        var act = () => _sut.DeleteIfExistsAsync(PartitionKeyValue, entity.Id!, cancellationToken);
+
+        // Assert
+        await Assert.ThrowsAsync<OperationCanceledException>(act);
+    }
+
+    [Fact]
     public async Task GetAsync_CancellationRequest_ThrowsException()
     {
         // Arrange
@@ -371,7 +499,48 @@ public class CosmosGenericRepositoryTests
         await Assert.ThrowsAsync<ArgumentException>(act);
     }
 
+    [Fact]
+    public async Task DeleteIfExistsAsync_MissingItem_ReturnsFalse()
+    {
+        // Arrange
+        var id = Guid.NewGuid().ToString("N");
+        var cancellationToken = CancellationToken.None;
+
+        _containerMock
+            .Setup(c => c.DeleteItemAsync<TestDao>(id, new PartitionKey(PartitionKeyValue), null, cancellationToken))
+            .ThrowsAsync(CreateCosmosException(System.Net.HttpStatusCode.NotFound));
+
+        // Act
+        var result = await _sut.DeleteIfExistsAsync(PartitionKeyValue, id, cancellationToken);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_MissingItem_ThrowsException()
+    {
+        // Arrange
+        var id = Guid.NewGuid().ToString("N");
+        var cancellationToken = CancellationToken.None;
+
+        _containerMock
+            .Setup(c => c.DeleteItemAsync<TestDao>(id, new PartitionKey(PartitionKeyValue), null, cancellationToken))
+            .ThrowsAsync(CreateCosmosException(System.Net.HttpStatusCode.NotFound));
+
+        // Act
+        var act = () => _sut.DeleteAsync(PartitionKeyValue, id, cancellationToken);
+
+        // Assert
+        await Assert.ThrowsAsync<CosmosException>(act);
+    }
+
     #endregion
+
+    private static CosmosException CreateCosmosException(System.Net.HttpStatusCode statusCode)
+    {
+        return new CosmosException("Cosmos operation failed.", statusCode, 0, Guid.NewGuid().ToString("N"), 0);
+    }
 
     private static Mock<FeedIterator<TItem>> CreateFeedIterator<TItem>(IReadOnlyList<TItem> items, CancellationToken cancellationToken)
     {

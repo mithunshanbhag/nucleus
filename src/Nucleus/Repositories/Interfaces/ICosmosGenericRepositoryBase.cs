@@ -158,6 +158,53 @@ public interface ICosmosGenericRepository<TEntity> where TEntity : class
     Task<TEntity?> GetAsync(PartitionKey partitionKey, string id, CancellationToken cancellationToken = default);
 
     /// <summary>
+    ///     Executes a scalar query across partitions and materializes the returned values as <typeparamref name="TValue" />.
+    /// </summary>
+    /// <typeparam name="TValue">The scalar value type returned by the query.</typeparam>
+    /// <param name="querySpec">The query definition to execute.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>The scalar values returned by the query, or an empty collection when nothing matches.</returns>
+    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
+    [Obsolete("Use GetScalarValuesAcrossPartitionsAsync<TValue>(QueryDefinition, CancellationToken) to make cross-partition behavior explicit.")]
+    Task<IEnumerable<TValue>> GetScalarValuesAsync<TValue>(QueryDefinition querySpec,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Executes a scalar query across partitions and materializes the returned values as <typeparamref name="TValue" />.
+    /// </summary>
+    /// <typeparam name="TValue">The scalar value type returned by the query.</typeparam>
+    /// <param name="querySpec">The query definition to execute.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>The scalar values returned by the query, or an empty collection when nothing matches.</returns>
+    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
+    Task<IEnumerable<TValue>> GetScalarValuesAcrossPartitionsAsync<TValue>(QueryDefinition querySpec,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Executes a scalar query in a single partition and materializes the returned values as <typeparamref name="TValue" />.
+    /// </summary>
+    /// <typeparam name="TValue">The scalar value type returned by the query.</typeparam>
+    /// <param name="partitionKey">The partition key value that scopes the query.</param>
+    /// <param name="querySpec">The query definition to execute.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>The scalar values returned by the query, or an empty collection when nothing matches.</returns>
+    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
+    Task<IEnumerable<TValue>> GetScalarValuesByPartitionAsync<TValue>(string partitionKey, QueryDefinition querySpec,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Executes a scalar query in a single partition and materializes the returned values as <typeparamref name="TValue" />.
+    /// </summary>
+    /// <typeparam name="TValue">The scalar value type returned by the query.</typeparam>
+    /// <param name="partitionKey">The partition key that scopes the query.</param>
+    /// <param name="querySpec">The query definition to execute.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>The scalar values returned by the query, or an empty collection when nothing matches.</returns>
+    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
+    Task<IEnumerable<TValue>> GetScalarValuesByPartitionAsync<TValue>(PartitionKey partitionKey, QueryDefinition querySpec,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     ///     Executes a query across partitions that returns scalar string values.
     /// </summary>
     /// <param name="querySpec">The query definition to execute.</param>
@@ -197,6 +244,88 @@ public interface ICosmosGenericRepository<TEntity> where TEntity : class
     /// <returns>The string values returned by the query, or an empty collection when nothing matches.</returns>
     /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
     Task<IEnumerable<string>> GetValuesByPartitionAsync(PartitionKey partitionKey, QueryDefinition querySpec,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Determines whether any entities match the supplied filter across partitions.
+    /// </summary>
+    /// <param name="filterClause">An optional SQL predicate without the leading <c>where</c> keyword.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns><see langword="true" /> when at least one entity matches; otherwise, <see langword="false" />.</returns>
+    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
+    [Obsolete("Use ExistsAcrossPartitionsAsync(string?, CancellationToken) to make cross-partition behavior explicit.")]
+    Task<bool> ExistsAsync(string? filterClause = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Determines whether any entities match the supplied filter across partitions.
+    /// </summary>
+    /// <param name="filterClause">An optional SQL predicate without the leading <c>where</c> keyword.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns><see langword="true" /> when at least one entity matches; otherwise, <see langword="false" />.</returns>
+    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
+    Task<bool> ExistsAcrossPartitionsAsync(string? filterClause = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Determines whether any entities match the supplied filter in a single partition.
+    /// </summary>
+    /// <param name="partitionKey">The partition key value that scopes the lookup.</param>
+    /// <param name="filterClause">An optional SQL predicate without the leading <c>where</c> keyword.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns><see langword="true" /> when at least one entity matches; otherwise, <see langword="false" />.</returns>
+    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
+    Task<bool> ExistsByPartitionAsync(string partitionKey, string? filterClause = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Determines whether any entities match the supplied filter in a single partition.
+    /// </summary>
+    /// <param name="partitionKey">The partition key that scopes the lookup.</param>
+    /// <param name="filterClause">An optional SQL predicate without the leading <c>where</c> keyword.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns><see langword="true" /> when at least one entity matches; otherwise, <see langword="false" />.</returns>
+    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
+    Task<bool> ExistsByPartitionAsync(PartitionKey partitionKey, string? filterClause = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Counts the entities that match the supplied filter across partitions.
+    /// </summary>
+    /// <param name="filterClause">An optional SQL predicate without the leading <c>where</c> keyword.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>The number of matching entities.</returns>
+    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
+    [Obsolete("Use CountAcrossPartitionsAsync(string?, CancellationToken) to make cross-partition behavior explicit.")]
+    Task<long> CountAsync(string? filterClause = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Counts the entities that match the supplied filter across partitions.
+    /// </summary>
+    /// <param name="filterClause">An optional SQL predicate without the leading <c>where</c> keyword.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>The number of matching entities.</returns>
+    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
+    Task<long> CountAcrossPartitionsAsync(string? filterClause = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Counts the entities that match the supplied filter in a single partition.
+    /// </summary>
+    /// <param name="partitionKey">The partition key value that scopes the count.</param>
+    /// <param name="filterClause">An optional SQL predicate without the leading <c>where</c> keyword.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>The number of matching entities.</returns>
+    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
+    Task<long> CountByPartitionAsync(string partitionKey, string? filterClause = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Counts the entities that match the supplied filter in a single partition.
+    /// </summary>
+    /// <param name="partitionKey">The partition key that scopes the count.</param>
+    /// <param name="filterClause">An optional SQL predicate without the leading <c>where</c> keyword.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>The number of matching entities.</returns>
+    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
+    Task<long> CountByPartitionAsync(PartitionKey partitionKey, string? filterClause = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -290,6 +419,30 @@ public interface ICosmosGenericRepository<TEntity> where TEntity : class
     /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
     Task<TransactionalBatchResponse> UpsertRangeAsync(PartitionKey partitionKey, IReadOnlyList<TEntity> entities,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Deletes an entity by its partition key value and identifier.
+    /// </summary>
+    /// <param name="partitionKey">The partition key value of the entity to delete.</param>
+    /// <param name="id">The identifier of the entity to delete.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>
+    ///     <see langword="true" /> when the entity existed and was deleted; otherwise, <see langword="false" />.
+    /// </returns>
+    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
+    Task<bool> DeleteIfExistsAsync(string partitionKey, string id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Deletes an entity by its partition key and identifier when it exists.
+    /// </summary>
+    /// <param name="partitionKey">The partition key of the entity to delete.</param>
+    /// <param name="id">The identifier of the entity to delete.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>
+    ///     <see langword="true" /> when the entity existed and was deleted; otherwise, <see langword="false" />.
+    /// </returns>
+    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
+    Task<bool> DeleteIfExistsAsync(PartitionKey partitionKey, string id, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Deletes an entity by its partition key value and identifier.
