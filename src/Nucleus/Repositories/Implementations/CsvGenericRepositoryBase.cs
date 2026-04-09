@@ -1,7 +1,12 @@
-﻿namespace Nucleus.Repositories.Implementations;
+namespace Nucleus.Repositories.Implementations;
 
+/// <summary>
+///     Provides shared CSV repository operations backed by <see cref="CsvHelper" />.
+/// </summary>
+/// <param name="csvConfig">The CSV configuration used for reading and writing records.</param>
 public abstract class CsvGenericRepositoryBase(CsvConfiguration csvConfig) : ICsvGenericRepository
 {
+    /// <inheritdoc />
     public async Task<IReadOnlyList<TCsvRecord>> GetAllRecordsAsync<TCsvRecord>(Stream stream, CancellationToken cancellationToken = default) where TCsvRecord : class
     {
         if (stream == null || stream.Length == 0) return [];
@@ -23,11 +28,13 @@ public abstract class CsvGenericRepositoryBase(CsvConfiguration csvConfig) : ICs
         return records;
     }
 
+    /// <inheritdoc />
     public async Task<Stream> WriteAllRecordsAsync<TCsvRecord>(IReadOnlyList<TCsvRecord> records, CancellationToken cancellationToken = default) where TCsvRecord : class
     {
         return await NewMethodAsync(records, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<Stream> WriteAllRecordsAsync(IReadOnlyList<dynamic> records, CancellationToken cancellationToken = default)
     {
         return await NewMethodAsync(records, cancellationToken);
