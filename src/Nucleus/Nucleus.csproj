@@ -7,7 +7,7 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Nucleus</Title>
 		<Authors>Mithun Shanbhag</Authors>
-		<Version>1.0.0-alpha.10</Version>
+		<Version>1.0.0-alpha.11</Version>
 		<PackageId>MithunShanbhag.Nucleus</PackageId>
 	</PropertyGroup>
 
