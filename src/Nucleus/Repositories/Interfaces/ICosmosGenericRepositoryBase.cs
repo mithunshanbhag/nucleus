@@ -18,36 +18,8 @@ public interface ICosmosGenericRepository<TEntity> where TEntity : class
     /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
     /// <returns>The entities returned by the query, or an empty collection when nothing matches.</returns>
     /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
-    [Obsolete("Use QueryAcrossPartitionsAsync(string, CancellationToken) to make cross-partition behavior explicit.")]
-    Task<IEnumerable<TEntity>> QueryAsync(string querySpec, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    ///     Executes a Cosmos DB SQL query string across partitions and returns the matching entities.
-    /// </summary>
-    /// <param name="querySpec">The Cosmos DB SQL query text to execute.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>The entities returned by the query, or an empty collection when nothing matches.</returns>
-    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
     Task<IEnumerable<TEntity>> QueryAcrossPartitionsAsync(string querySpec, CancellationToken cancellationToken = default);
 
-    /// <summary>
-    ///     Executes a Cosmos DB query definition across partitions and returns the matching entities.
-    /// </summary>
-    /// <param name="queryDefinition">The query definition to execute.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>The entities returned by the query, or an empty collection when nothing matches.</returns>
-    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
-    [Obsolete("Use QueryAcrossPartitionsAsync(QueryDefinition, CancellationToken) to make cross-partition behavior explicit.")]
-    Task<IEnumerable<TEntity>> QueryAsync(QueryDefinition queryDefinition,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
-    ///     Executes a Cosmos DB query definition across partitions and returns the matching entities.
-    /// </summary>
-    /// <param name="queryDefinition">The query definition to execute.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>The entities returned by the query, or an empty collection when nothing matches.</returns>
-    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
     Task<IEnumerable<TEntity>> QueryAcrossPartitionsAsync(QueryDefinition queryDefinition,
         CancellationToken cancellationToken = default);
 
@@ -95,23 +67,6 @@ public interface ICosmosGenericRepository<TEntity> where TEntity : class
     Task<IEnumerable<TEntity>> QueryByPartitionAsync(PartitionKey partitionKey, QueryDefinition queryDefinition,
         CancellationToken cancellationToken = default);
 
-    /// <summary>
-    ///     Lists entities across partitions, optionally applying a SQL filter clause.
-    /// </summary>
-    /// <param name="filterClause">An optional SQL filter clause appended to the base query.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>The entities returned by the query, or an empty collection when nothing matches.</returns>
-    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
-    [Obsolete("Use ListAcrossPartitionsAsync(string?, CancellationToken) to make cross-partition behavior explicit.")]
-    Task<IEnumerable<TEntity>> ListAsync(string? filterClause = null, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    ///     Lists entities across partitions, optionally applying a SQL filter clause.
-    /// </summary>
-    /// <param name="filterClause">An optional SQL filter clause appended to the base query.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>The entities returned by the query, or an empty collection when nothing matches.</returns>
-    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
     Task<IEnumerable<TEntity>> ListAcrossPartitionsAsync(string? filterClause = null,
         CancellationToken cancellationToken = default);
 
@@ -157,26 +112,6 @@ public interface ICosmosGenericRepository<TEntity> where TEntity : class
     /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
     Task<TEntity?> GetAsync(PartitionKey partitionKey, string id, CancellationToken cancellationToken = default);
 
-    /// <summary>
-    ///     Executes a scalar query across partitions and materializes the returned values as <typeparamref name="TValue" />.
-    /// </summary>
-    /// <typeparam name="TValue">The scalar value type returned by the query.</typeparam>
-    /// <param name="querySpec">The query definition to execute.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>The scalar values returned by the query, or an empty collection when nothing matches.</returns>
-    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
-    [Obsolete("Use GetScalarValuesAcrossPartitionsAsync<TValue>(QueryDefinition, CancellationToken) to make cross-partition behavior explicit.")]
-    Task<IEnumerable<TValue>> GetScalarValuesAsync<TValue>(QueryDefinition querySpec,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
-    ///     Executes a scalar query across partitions and materializes the returned values as <typeparamref name="TValue" />.
-    /// </summary>
-    /// <typeparam name="TValue">The scalar value type returned by the query.</typeparam>
-    /// <param name="querySpec">The query definition to execute.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>The scalar values returned by the query, or an empty collection when nothing matches.</returns>
-    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
     Task<IEnumerable<TValue>> GetScalarValuesAcrossPartitionsAsync<TValue>(QueryDefinition querySpec,
         CancellationToken cancellationToken = default);
 
@@ -204,23 +139,6 @@ public interface ICosmosGenericRepository<TEntity> where TEntity : class
     Task<IEnumerable<TValue>> GetScalarValuesByPartitionAsync<TValue>(PartitionKey partitionKey, QueryDefinition querySpec,
         CancellationToken cancellationToken = default);
 
-    /// <summary>
-    ///     Executes a query across partitions that returns scalar string values.
-    /// </summary>
-    /// <param name="querySpec">The query definition to execute.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>The string values returned by the query, or an empty collection when nothing matches.</returns>
-    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
-    [Obsolete("Use GetValuesAcrossPartitionsAsync(QueryDefinition, CancellationToken) to make cross-partition behavior explicit.")]
-    Task<IEnumerable<string>> GetValuesAsync(QueryDefinition querySpec, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    ///     Executes a query across partitions that returns scalar string values.
-    /// </summary>
-    /// <param name="querySpec">The query definition to execute.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>The string values returned by the query, or an empty collection when nothing matches.</returns>
-    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
     Task<IEnumerable<string>> GetValuesAcrossPartitionsAsync(QueryDefinition querySpec,
         CancellationToken cancellationToken = default);
 
@@ -246,23 +164,6 @@ public interface ICosmosGenericRepository<TEntity> where TEntity : class
     Task<IEnumerable<string>> GetValuesByPartitionAsync(PartitionKey partitionKey, QueryDefinition querySpec,
         CancellationToken cancellationToken = default);
 
-    /// <summary>
-    ///     Determines whether any entities match the supplied filter across partitions.
-    /// </summary>
-    /// <param name="filterClause">An optional SQL predicate without the leading <c>where</c> keyword.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns><see langword="true" /> when at least one entity matches; otherwise, <see langword="false" />.</returns>
-    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
-    [Obsolete("Use ExistsAcrossPartitionsAsync(string?, CancellationToken) to make cross-partition behavior explicit.")]
-    Task<bool> ExistsAsync(string? filterClause = null, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    ///     Determines whether any entities match the supplied filter across partitions.
-    /// </summary>
-    /// <param name="filterClause">An optional SQL predicate without the leading <c>where</c> keyword.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns><see langword="true" /> when at least one entity matches; otherwise, <see langword="false" />.</returns>
-    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
     Task<bool> ExistsAcrossPartitionsAsync(string? filterClause = null, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -287,23 +188,6 @@ public interface ICosmosGenericRepository<TEntity> where TEntity : class
     Task<bool> ExistsByPartitionAsync(PartitionKey partitionKey, string? filterClause = null,
         CancellationToken cancellationToken = default);
 
-    /// <summary>
-    ///     Counts the entities that match the supplied filter across partitions.
-    /// </summary>
-    /// <param name="filterClause">An optional SQL predicate without the leading <c>where</c> keyword.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>The number of matching entities.</returns>
-    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
-    [Obsolete("Use CountAcrossPartitionsAsync(string?, CancellationToken) to make cross-partition behavior explicit.")]
-    Task<long> CountAsync(string? filterClause = null, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    ///     Counts the entities that match the supplied filter across partitions.
-    /// </summary>
-    /// <param name="filterClause">An optional SQL predicate without the leading <c>where</c> keyword.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>The number of matching entities.</returns>
-    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
     Task<long> CountAcrossPartitionsAsync(string? filterClause = null, CancellationToken cancellationToken = default);
 
     /// <summary>

@@ -32,13 +32,6 @@ public abstract class CosmosGenericRepositoryBase<TEntity> : ICosmosGenericRepos
     }
 
     /// <inheritdoc />
-    [Obsolete("Use QueryAcrossPartitionsAsync(string, CancellationToken) to make cross-partition behavior explicit.")]
-    public async Task<IEnumerable<TEntity>> QueryAsync(string querySpec, CancellationToken cancellationToken = default)
-    {
-        return await QueryAcrossPartitionsAsync(querySpec, cancellationToken);
-    }
-
-    /// <inheritdoc />
     public async Task<IEnumerable<TEntity>> QueryAcrossPartitionsAsync(string querySpec,
         CancellationToken cancellationToken = default)
     {
@@ -46,26 +39,10 @@ public abstract class CosmosGenericRepositoryBase<TEntity> : ICosmosGenericRepos
     }
 
     /// <inheritdoc />
-    [Obsolete("Use QueryAcrossPartitionsAsync(QueryDefinition, CancellationToken) to make cross-partition behavior explicit.")]
-    public async Task<IEnumerable<TEntity>> QueryAsync(QueryDefinition queryDefinition,
-        CancellationToken cancellationToken = default)
-    {
-        return await QueryAcrossPartitionsAsync(queryDefinition, cancellationToken);
-    }
-
-    /// <inheritdoc />
     public async Task<IEnumerable<TEntity>> QueryAcrossPartitionsAsync(QueryDefinition queryDefinition,
         CancellationToken cancellationToken = default)
     {
         return await ExecuteQueryAsync<TEntity>(queryDefinition, null, cancellationToken);
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Use ListAcrossPartitionsAsync(string?, CancellationToken) to make cross-partition behavior explicit.")]
-    public async Task<IEnumerable<TEntity>> ListAsync(string? filterClause = null,
-        CancellationToken cancellationToken = default)
-    {
-        return await ListAcrossPartitionsAsync(filterClause, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -147,14 +124,6 @@ public abstract class CosmosGenericRepositoryBase<TEntity> : ICosmosGenericRepos
     }
 
     /// <inheritdoc />
-    [Obsolete("Use GetScalarValuesAcrossPartitionsAsync<TValue>(QueryDefinition, CancellationToken) to make cross-partition behavior explicit.")]
-    public async Task<IEnumerable<TValue>> GetScalarValuesAsync<TValue>(QueryDefinition querySpec,
-        CancellationToken cancellationToken = default)
-    {
-        return await GetScalarValuesAcrossPartitionsAsync<TValue>(querySpec, cancellationToken);
-    }
-
-    /// <inheritdoc />
     public async Task<IEnumerable<TValue>> GetScalarValuesAcrossPartitionsAsync<TValue>(QueryDefinition querySpec,
         CancellationToken cancellationToken = default)
     {
@@ -173,14 +142,6 @@ public abstract class CosmosGenericRepositoryBase<TEntity> : ICosmosGenericRepos
         CancellationToken cancellationToken = default)
     {
         return await ExecuteQueryAsync<TValue>(querySpec, CreateQueryRequestOptions(partitionKey), cancellationToken);
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Use GetValuesAcrossPartitionsAsync(QueryDefinition, CancellationToken) to make cross-partition behavior explicit.")]
-    public async Task<IEnumerable<string>> GetValuesAsync(QueryDefinition querySpec,
-        CancellationToken cancellationToken = default)
-    {
-        return await GetValuesAcrossPartitionsAsync(querySpec, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -205,13 +166,6 @@ public abstract class CosmosGenericRepositoryBase<TEntity> : ICosmosGenericRepos
     }
 
     /// <inheritdoc />
-    [Obsolete("Use ExistsAcrossPartitionsAsync(string?, CancellationToken) to make cross-partition behavior explicit.")]
-    public async Task<bool> ExistsAsync(string? filterClause = null, CancellationToken cancellationToken = default)
-    {
-        return await ExistsAcrossPartitionsAsync(filterClause, cancellationToken);
-    }
-
-    /// <inheritdoc />
     public async Task<bool> ExistsAcrossPartitionsAsync(string? filterClause = null, CancellationToken cancellationToken = default)
     {
         return await CountAcrossPartitionsAsync(filterClause, cancellationToken) > 0;
@@ -229,13 +183,6 @@ public abstract class CosmosGenericRepositoryBase<TEntity> : ICosmosGenericRepos
         CancellationToken cancellationToken = default)
     {
         return await CountByPartitionAsync(partitionKey, filterClause, cancellationToken) > 0;
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Use CountAcrossPartitionsAsync(string?, CancellationToken) to make cross-partition behavior explicit.")]
-    public async Task<long> CountAsync(string? filterClause = null, CancellationToken cancellationToken = default)
-    {
-        return await CountAcrossPartitionsAsync(filterClause, cancellationToken);
     }
 
     /// <inheritdoc />
