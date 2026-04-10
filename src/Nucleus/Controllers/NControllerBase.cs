@@ -2,33 +2,9 @@
 
 namespace Nucleus.Controllers;
 
-public abstract class NControllerBase
+public abstract class NControllerBase(ILogger<NControllerBase> logger)
 {
-    protected readonly ILogger<NControllerBase> Logger;
-
-    protected readonly IMediator Mediator;
-
-    protected NControllerBase(IMediator mediator, ILogger<NControllerBase> logger)
-    {
-        Mediator = mediator;
-        Logger = logger;
-    }
-
-    protected async Task<IActionResult> ProcessRequestAsync(IRequest<IActionResult> request)
-    {
-        try
-        {
-            return await Mediator.Send(request);
-        }
-        catch (NExceptionBase cpe)
-        {
-            return cpe.ToActionResult();
-        }
-        catch (ValidationException ve)
-        {
-            return new BadRequestObjectResult(ve.Message);
-        }
-    }
+    protected readonly ILogger<NControllerBase> Logger = logger;
 
     protected static async Task<IActionResult> ProcessAsync(Func<Task<IActionResult>> func)
     {

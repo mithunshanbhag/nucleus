@@ -14,22 +14,16 @@ namespace Nucleus.Repositories.Implementations;
 /// services.AddSingleton(_ => new CosmosClient(dbConnectionString, cosmosClientOptions).GetDatabase(dbName));
 /// </code>
 /// </remarks>
-public abstract class CosmosGenericRepositoryBase<TEntity> : ICosmosGenericRepository<TEntity> where TEntity : class
+/// <remarks>
+///     Initializes a new instance of the <see cref="CosmosGenericRepositoryBase{TEntity}" /> class.
+/// </remarks>
+/// <param name="cosmosDatabase">The Cosmos DB database used by the repository.</param>
+/// <param name="containerName">The name of the container that stores the entities.</param>
+public abstract class CosmosGenericRepositoryBase<TEntity>(Database cosmosDatabase, string containerName) : ICosmosGenericRepository<TEntity> where TEntity : class
 {
-    protected readonly string ContainerName;
+    protected readonly string ContainerName = containerName;
 
-    protected readonly Database CosmosDatabase;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="CosmosGenericRepositoryBase{TEntity}" /> class.
-    /// </summary>
-    /// <param name="cosmosDatabase">The Cosmos DB database used by the repository.</param>
-    /// <param name="containerName">The name of the container that stores the entities.</param>
-    protected CosmosGenericRepositoryBase(Database cosmosDatabase, string containerName)
-    {
-        ContainerName = containerName;
-        CosmosDatabase = cosmosDatabase;
-    }
+    protected readonly Database CosmosDatabase = cosmosDatabase;
 
     private Container Container => CosmosDatabase.GetContainer(ContainerName);
 

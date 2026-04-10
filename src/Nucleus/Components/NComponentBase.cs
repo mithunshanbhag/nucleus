@@ -1,14 +1,6 @@
 ﻿namespace Nucleus.Components;
 
-public class NComponentBase : ComponentBase
+public abstract class NComponentBase(ILogger<ComponentBase> logger) : ComponentBase
 {
-    protected readonly ILogger<ComponentBase> Logger;
-
-    protected readonly IMediator Mediator;
-
-    protected NComponentBase(IMediator mediator, ILogger<ComponentBase> logger)
-    {
-        Mediator = mediator;
-        Logger = logger;
-    }
+    protected readonly ILogger<ComponentBase> Logger = logger;
 }

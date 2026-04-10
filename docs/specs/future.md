@@ -2,11 +2,6 @@
 
 This document captures future-facing ideas, improvements, and technical recommendations that may be worth revisiting as the package evolves.
 
-## General Housekeeping
-
-- Migrate away from `AutoMapper` to `Mapperly` (recommended) or `Mapster`.
-- Migrate away from `MediatR` to some other alternative (needs more research and evaluation).
-
 ## Cosmos Repository
 
 ### Context

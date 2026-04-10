@@ -24,7 +24,7 @@ The main library lives in [`src/Nucleus`](src/Nucleus) and the automated tests l
 - **Package ID:** `MithunShanbhag.Nucleus`
 - **Target framework:** `net10.0`
 - **Output type:** reusable NuGet package generated from `src\Nucleus\Nucleus.csproj`
-- **Key dependencies:** MediatR, FluentValidation, AutoMapper, Azure SDKs, Polly, CsvHelper, Spectre.Console
+- **Key dependencies:** FluentValidation, Azure SDKs, Polly, CsvHelper, Spectre.Console
 
 ## 🚀 Installation
 
