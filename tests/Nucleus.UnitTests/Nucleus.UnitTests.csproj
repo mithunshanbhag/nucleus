@@ -11,7 +11,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Include="Misc\Helpers\.gitkeep" />
+		<Compile Include="Misc\Helpers\.gitkeep" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -1,13 +1,9 @@
 ﻿namespace Nucleus.EventStreams.Implementations;
 
-public abstract class ServiceBusEventStreamBase<TEvent> : IServiceBusEventStream<TEvent> where TEvent : class
+public abstract class ServiceBusEventStreamBase<TEvent>(ServiceBusClient serviceBusClient, string queueOrTopicName) : IServiceBusEventStream<TEvent>
+    where TEvent : class
 {
-    private readonly ServiceBusSender _serviceBusSender;
-
-    protected ServiceBusEventStreamBase(ServiceBusClient serviceBusClient, string queueOrTopicName)
-    {
-        _serviceBusSender = serviceBusClient.CreateSender(queueOrTopicName);
-    }
+    private readonly ServiceBusSender _serviceBusSender = serviceBusClient.CreateSender(queueOrTopicName);
 
     public async Task PublishAsync(TEvent evt, CancellationToken cancellationToken = default)
     {
