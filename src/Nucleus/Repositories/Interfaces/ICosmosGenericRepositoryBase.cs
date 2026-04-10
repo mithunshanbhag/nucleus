@@ -116,7 +116,8 @@ public interface ICosmosGenericRepository<TEntity> where TEntity : class
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Executes a scalar query in a single partition and materializes the returned values as <typeparamref name="TValue" />.
+    ///     Executes a scalar query in a single partition and materializes the returned values as
+    ///     <typeparamref name="TValue" />.
     /// </summary>
     /// <typeparam name="TValue">The scalar value type returned by the query.</typeparam>
     /// <param name="partitionKey">The partition key value that scopes the query.</param>
@@ -128,7 +129,8 @@ public interface ICosmosGenericRepository<TEntity> where TEntity : class
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Executes a scalar query in a single partition and materializes the returned values as <typeparamref name="TValue" />.
+    ///     Executes a scalar query in a single partition and materializes the returned values as
+    ///     <typeparamref name="TValue" />.
     /// </summary>
     /// <typeparam name="TValue">The scalar value type returned by the query.</typeparam>
     /// <param name="partitionKey">The partition key that scopes the query.</param>

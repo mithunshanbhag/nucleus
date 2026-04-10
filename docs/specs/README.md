@@ -15,12 +15,12 @@ The package currently focuses on shared .NET building blocks such as:
 
 ## Repository structure
 
-| Path | Role |
-| --- | --- |
-| `src/Nucleus/` | Package source and package metadata |
-| `tests/Nucleus.UnitTests/` | Automated test coverage for the package |
-| `docs/specs/` | Package-level specification notes |
-| `docs/ui-mockups/` | Reserved for future mockups if a demo UI is introduced |
+| Path                       | Role                                                   |
+| -------------------------- | ------------------------------------------------------ |
+| `src/Nucleus/`             | Package source and package metadata                    |
+| `tests/Nucleus.UnitTests/` | Automated test coverage for the package                |
+| `docs/specs/`              | Package-level specification notes                      |
+| `docs/ui-mockups/`         | Reserved for future mockups if a demo UI is introduced |
 
 ## Non-goals for this repo
 

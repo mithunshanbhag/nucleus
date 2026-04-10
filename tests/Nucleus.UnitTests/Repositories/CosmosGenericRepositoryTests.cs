@@ -1,3 +1,6 @@
+using System.Collections;
+using System.Net;
+
 namespace Nucleus.UnitTests.Repositories;
 
 public class CosmosGenericRepositoryTests
@@ -6,8 +9,8 @@ public class CosmosGenericRepositoryTests
 
     private readonly Mock<Container> _containerMock = new();
     private readonly Mock<Database> _databaseMock = new();
-    private readonly Mock<TransactionalBatch> _transactionalBatchMock = new();
     private readonly ICosmosTestRepository _sut;
+    private readonly Mock<TransactionalBatch> _transactionalBatchMock = new();
 
     public CosmosGenericRepositoryTests()
     {
@@ -24,6 +27,39 @@ public class CosmosGenericRepositoryTests
         {
             Id = DateTime.UtcNow.ToString("o")
         };
+    }
+
+    private static CosmosException CreateCosmosException(HttpStatusCode statusCode)
+    {
+        return new CosmosException("Cosmos operation failed.", statusCode, 0, Guid.NewGuid().ToString("N"), 0);
+    }
+
+    private static Mock<FeedIterator<TItem>> CreateFeedIterator<TItem>(IReadOnlyList<TItem> items, CancellationToken cancellationToken)
+    {
+        var feedResponseMock = CreateFeedResponse(items);
+        var iteratorMock = new Mock<FeedIterator<TItem>>();
+
+        iteratorMock.SetupSequence(x => x.HasMoreResults)
+            .Returns(true)
+            .Returns(false);
+        iteratorMock
+            .Setup(x => x.ReadNextAsync(cancellationToken))
+            .ReturnsAsync(feedResponseMock.Object);
+
+        return iteratorMock;
+    }
+
+    private static Mock<FeedResponse<TItem>> CreateFeedResponse<TItem>(IReadOnlyList<TItem> items)
+    {
+        var feedResponseMock = new Mock<FeedResponse<TItem>>();
+
+        feedResponseMock.Setup(x => x.GetEnumerator()).Returns(() => items.GetEnumerator());
+        feedResponseMock
+            .As<IEnumerable>()
+            .Setup(x => x.GetEnumerator())
+            .Returns(() => items.GetEnumerator());
+
+        return feedResponseMock;
     }
 
     #region Positive Cases
@@ -170,7 +206,7 @@ public class CosmosGenericRepositoryTests
         // Arrange
         var cancellationToken = CancellationToken.None;
         var expectedValue = 42L;
-        var iteratorMock = CreateFeedIterator<long>([expectedValue], cancellationToken);
+        var iteratorMock = CreateFeedIterator([expectedValue], cancellationToken);
         var queryDefinition = new QueryDefinition("select value count(1) from c where c.type = @type")
             .WithParameter("@type", PartitionKeyValue);
 
@@ -243,7 +279,7 @@ public class CosmosGenericRepositoryTests
     {
         // Arrange
         var cancellationToken = CancellationToken.None;
-        var iteratorMock = CreateFeedIterator<long>([1L], cancellationToken);
+        var iteratorMock = CreateFeedIterator([1L], cancellationToken);
 
         _containerMock
             .Setup(c => c.GetItemQueryIterator<long>(
@@ -277,7 +313,7 @@ public class CosmosGenericRepositoryTests
         // Arrange
         const long expectedCount = 3;
         var cancellationToken = CancellationToken.None;
-        var iteratorMock = CreateFeedIterator<long>([expectedCount], cancellationToken);
+        var iteratorMock = CreateFeedIterator([expectedCount], cancellationToken);
 
         _containerMock
             .Setup(c => c.GetItemQueryIterator<long>(
@@ -508,7 +544,7 @@ public class CosmosGenericRepositoryTests
 
         _containerMock
             .Setup(c => c.DeleteItemAsync<TestDao>(id, new PartitionKey(PartitionKeyValue), null, cancellationToken))
-            .ThrowsAsync(CreateCosmosException(System.Net.HttpStatusCode.NotFound));
+            .ThrowsAsync(CreateCosmosException(HttpStatusCode.NotFound));
 
         // Act
         var result = await _sut.DeleteIfExistsAsync(PartitionKeyValue, id, cancellationToken);
@@ -526,7 +562,7 @@ public class CosmosGenericRepositoryTests
 
         _containerMock
             .Setup(c => c.DeleteItemAsync<TestDao>(id, new PartitionKey(PartitionKeyValue), null, cancellationToken))
-            .ThrowsAsync(CreateCosmosException(System.Net.HttpStatusCode.NotFound));
+            .ThrowsAsync(CreateCosmosException(HttpStatusCode.NotFound));
 
         // Act
         var act = () => _sut.DeleteAsync(PartitionKeyValue, id, cancellationToken);
@@ -536,37 +572,4 @@ public class CosmosGenericRepositoryTests
     }
 
     #endregion
-
-    private static CosmosException CreateCosmosException(System.Net.HttpStatusCode statusCode)
-    {
-        return new CosmosException("Cosmos operation failed.", statusCode, 0, Guid.NewGuid().ToString("N"), 0);
-    }
-
-    private static Mock<FeedIterator<TItem>> CreateFeedIterator<TItem>(IReadOnlyList<TItem> items, CancellationToken cancellationToken)
-    {
-        var feedResponseMock = CreateFeedResponse(items);
-        var iteratorMock = new Mock<FeedIterator<TItem>>();
-
-        iteratorMock.SetupSequence(x => x.HasMoreResults)
-            .Returns(true)
-            .Returns(false);
-        iteratorMock
-            .Setup(x => x.ReadNextAsync(cancellationToken))
-            .ReturnsAsync(feedResponseMock.Object);
-
-        return iteratorMock;
-    }
-
-    private static Mock<FeedResponse<TItem>> CreateFeedResponse<TItem>(IReadOnlyList<TItem> items)
-    {
-        var feedResponseMock = new Mock<FeedResponse<TItem>>();
-
-        feedResponseMock.Setup(x => x.GetEnumerator()).Returns(() => items.GetEnumerator());
-        feedResponseMock
-            .As<System.Collections.IEnumerable>()
-            .Setup(x => x.GetEnumerator())
-            .Returns(() => items.GetEnumerator());
-
-        return feedResponseMock;
-    }
 }

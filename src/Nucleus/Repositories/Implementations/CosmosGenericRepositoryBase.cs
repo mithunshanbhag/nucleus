@@ -31,6 +31,8 @@ public abstract class CosmosGenericRepositoryBase<TEntity> : ICosmosGenericRepos
         CosmosDatabase = cosmosDatabase;
     }
 
+    private Container Container => CosmosDatabase.GetContainer(ContainerName);
+
     /// <inheritdoc />
     public async Task<IEnumerable<TEntity>> QueryAcrossPartitionsAsync(string querySpec,
         CancellationToken cancellationToken = default)
@@ -340,8 +342,6 @@ public abstract class CosmosGenericRepositoryBase<TEntity> : ICosmosGenericRepos
         }, cancellationToken);
     }
 
-    private Container Container => CosmosDatabase.GetContainer(ContainerName);
-
     private static QueryDefinition CreateListQueryDefinition(string? filterClause)
     {
         var querySpec = "select * from c";
@@ -399,8 +399,8 @@ public abstract class CosmosGenericRepositoryBase<TEntity> : ICosmosGenericRepos
 
         using var queryIterator = Container.GetItemQueryIterator<TReturn>(
             queryDefinition,
-            continuationToken: null,
-            requestOptions: queryRequestOptions);
+            null,
+            queryRequestOptions);
 
         var results = new List<TReturn>();
         while (queryIterator.HasMoreResults)
